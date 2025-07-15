@@ -1,0 +1,74 @@
+{% extends 'main.html' %}
+{% block content %}
+  <!-- Main Section -->
+  <main class="projects">
+  <!-- Hero Section with Search -->
+  <section class="hero-section text-center py-5 bg-light">
+    <div class="container">
+      <h2 class="mb-4">Search for <span class="text-primary">Projects</span></h2>
+
+      <form class="row g-3 justify-content-center" action="#" method="get">
+        <div class="col-md-6">
+          <label for="formInputSearch" class="form-label">Search By Projects</label>
+          <input type="text" class="form-control" id="formInputSearch" name="text" placeholder="Search by Project Title">
+        </div>
+        <div class="col-md-2 d-grid align-items-end">
+          <button type="submit" class="btn btn-primary btn-lg mt-4">Search</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Project Cards Section -->
+  <section class="projectsList py-5">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+        <!-- Project Card Start -->
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <a href="single-project.html">
+              <img src="images/project-a.png" class="card-img-top" alt="Project Thumbnail">
+            </a>
+            <div class="card-body">
+              <h5 class="card-title">Yoga Studio Landing Page Website and Design</h5>
+              <p class="card-text"><a href="profile.html" class="text-decoration-none">By Dennis Ivanov</a></p>
+              <p><strong>98%</strong> Positive Feedback (72 Votes)</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary">NextJS</span>
+                <span class="badge bg-primary">GraphQL</span>
+                <span class="badge bg-primary">TypeScript</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Project Card End -->
+
+        <!-- Duplicate and change content as needed -->
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <a href="single-project.html">
+              <img src="images/project-b.png" class="card-img-top" alt="Project Thumbnail">
+            </a>
+            <div class="card-body">
+              <h5 class="card-title">DevSearch UI Design</h5>
+              <p class="card-text"><a href="profile.html" class="text-decoration-none">By Shahriar P. Shuvo</a></p>
+              <p><strong>92%</strong> Positive Feedback (62 Votes)</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary">NextJS</span>
+                <span class="badge bg-primary">GraphQL</span>
+                <span class="badge bg-primary">TypeScript</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repeat structure for other projects as needed -->
+        <!-- ... -->
+
+      </div>
+    </div>
+  </section>
+</main>
+
+{% endblock content %}
