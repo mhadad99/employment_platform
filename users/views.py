@@ -1,5 +1,5 @@
 from django.dispatch.dispatcher import receiver
-from .models import Employee, Employer, Profile, ProgrammingLanguage
+from .models import Employee, Employer, Profile, ProgrammingLanguage, ProfileView
 from .forms import CustomUserCreationForm, EmployeeRegistrationForm, EmployerRegistrationForm, EmployeeForm
 from django.db.models import Q
 from django.urls import conf
@@ -9,7 +9,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
-# Add language to employee
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from jobs.models import Notification
+from datetime import timedelta
+
+
+
+# Create your views here.
 
 
 @login_required(login_url='login')
@@ -23,7 +30,6 @@ def add_language(request):
         employee.programming_languages.add(lang_obj)
     return redirect('user-account')
 
-# Delete language from employee
 
 
 @login_required(login_url='login')
@@ -38,8 +44,7 @@ def delete_language(request, lang_id):
     return redirect('user-account')
 
 
-# Create your views here.
-# home
+
 
 
 def loginUser(request):
@@ -143,27 +148,84 @@ def employees(request):
     return render(request, 'users/employees.html', context)
 
 
+# def userProfile(request, pk):
+#     employee = Employee.objects.get(id=pk)
+#     context = {'employee': employee}
+#     return render(request, 'users/user-profile.html', context)
+
 def userProfile(request, pk):
-    employee = Employee.objects.get(id=pk)
+    employee = get_object_or_404(Employee, id=pk)
+    current_user = request.user
+
+    # Only log profile view if the viewer is authenticated and not the employee themselves
+    if current_user.is_authenticated and current_user != employee.user:
+        try:
+            # Prevent duplicate views within 24 hours
+            recent_view = ProfileView.objects.filter(
+                employee=employee,
+                viewer=current_user,
+                timestamp__gte=timezone.now() - timedelta(hours=24)
+            ).exists()
+
+            if not recent_view:
+                ProfileView.objects.create(employee=employee, viewer=current_user)
+
+                message = f"{current_user.first_name} viewed your profile."
+                Notification.objects.create(
+                    recipient=employee,
+                    message=message
+                )
+
+        except Exception as e:
+            pass
+
     context = {'employee': employee}
     return render(request, 'users/user-profile.html', context)
 
 
+# @login_required(login_url='login')
+# def userAccount(request):
+#     # check user type and redirect to appropriate profile page
+#     if request.user.profile.user_type == 'employee':
+#         employee = Employee.objects.get(user=request.user)
+#         applications = employee.jobapplication_set.all()
+#         context = {'employee': employee,
+#                    'user_type': request.user.profile.user_type, 'applications': applications}
+#     elif request.user.profile.user_type == 'employer':
+#         employer = Employer.objects.get(user=request.user)
+#         context = {'employer': employer,
+#                    'user_type': request.user.profile.user_type}
+#     else:
+#         messages.error(request, 'Invalid user type')
+#         return redirect('login')
+#     return render(request, 'users/user-account.html', context)
+
+
 @login_required(login_url='login')
 def userAccount(request):
-    # check user type and redirect to appropriate profile page
     if request.user.profile.user_type == 'employee':
         employee = Employee.objects.get(user=request.user)
         applications = employee.jobapplication_set.all()
-        context = {'employee': employee,
-                   'user_type': request.user.profile.user_type, 'applications': applications}
+        
+        # Get total profile views
+        total_views = ProfileView.objects.filter(employee=employee).count()
+
+        context = {
+            'employee': employee,
+            'user_type': request.user.profile.user_type,
+            'applications': applications,
+            'total_profile_views': total_views
+        }
     elif request.user.profile.user_type == 'employer':
         employer = Employer.objects.get(user=request.user)
-        context = {'employer': employer,
-                   'user_type': request.user.profile.user_type}
+        context = {
+            'employer': employer,
+            'user_type': request.user.profile.user_type
+        }
     else:
         messages.error(request, 'Invalid user type')
         return redirect('login')
+
     return render(request, 'users/user-account.html', context)
 
 

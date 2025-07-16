@@ -14,4 +14,6 @@ urlpatterns = [
          views.manageApplications, name='manage-applications'),
     path('update-application/<str:app_id>/',
          views.updateApplication, name='update-application'),
+    path('notifications/', views.notifications, name='notifications'),
+
 ]

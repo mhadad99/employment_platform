@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Job, JobApplication
+from .models import Job, JobApplication, Notification
 from .forms import JobForm
 from users.models import ProgrammingLanguage, Employee
 
@@ -130,8 +130,27 @@ def updateApplication(request, app_id):
         action = request.POST.get('action')
         if action == 'accept':
             application.status = 'accepted'
+            message = f"Your application for '{application.job.title}' has been accepted!"
         elif action == 'reject':
             application.status = 'rejected'
+            message = f"Your application for '{application.job.title}' has been rejected."
         application.save()
-        # Optionally, send notification to employee here
+
+        # Send notification to employee
+        Notification.objects.create(
+            recipient=application.employee,
+            message=message
+        )
+
     return redirect('manage-applications', job_id=application.job.id)
+
+
+@login_required(login_url="login")
+def notifications(request):
+    employee = request.user.employee
+    notes = Notification.objects.filter(recipient=employee).order_by('-created_at')
+    # Mark all as read
+    notes.update(is_read=True)
+    return render(request, 'jobs/notifications.html', {'notifications': notes})
+
+

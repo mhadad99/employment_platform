@@ -1,0 +1,17 @@
+<!-- jobs/notifications.html -->
+{% extends "main.html" %}
+{% block content %}
+<h2>Notifications</h2>
+<div class="notifications">
+  {% if notifications %}
+    {% for note in notifications %}
+      <div class="notification {% if not note.is_read %}unread{% endif %}">
+        <p>{{ note.message }}</p>
+        <small>{{ note.created_at|timesince }} ago</small>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No notifications yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

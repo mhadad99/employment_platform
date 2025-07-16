@@ -11,6 +11,19 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        {% if request.user.is_authenticated and request.user.profile.user_type == 'employee'%}
+        {% if request.user.employee.notifications_set.count > 0 %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'notifications' %}"><i class="fas fa-bell" ></i></a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'notifications' %}"><i class="fas fa-bell-slash"></i></a>
+        </li>
+        {% endif %}
+        
+        {% endif %}
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link" href="{% url 'employees' %}">Developers</a>
         </li>
