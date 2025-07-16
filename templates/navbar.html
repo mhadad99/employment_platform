@@ -12,20 +12,23 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="">Developers</a>
+          <a class="nav-link" href="{% url 'employees' %}">Developers</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="">Projects</a>
+          <a class="nav-link" href="{% url 'jobs' %}">Jobs</a>
         </li>
-        <li class="nav-item">
+        {% comment %} <li class="nav-item">
           <a class="nav-link" href="#">Inbox</a>
-        </li>
+        </li> {% endcomment %}
         <li class="nav-item">
-          <a class="nav-link" href="#">My Account</a>
+          <a class="nav-link" href="{% url 'user-account' %}">My Account</a>
         </li>
+        {% if request.user.profile.user_type == 'employer' %}
         <li class="nav-item">
-          <a class="btn btn-primary me-2" href="">Post a Project</a>
+          <a class="btn btn-primary me-2" href="{% url 'create-job' %}">Post a Job</a>
         </li>
+        {% endif %}
+        
         {% if request.user.is_authenticated %}
         <li class="nav-item">
           <a class="btn btn-outline-secondary" href="{% url 'logout' %}">Logout</a>

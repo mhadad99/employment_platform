@@ -1,0 +1,193 @@
+{# User Account Template #}
+{% extends 'main.html' %}
+
+{% block content %}
+{% if user_type == 'employee' %}
+<main class="settingsPage py-5">
+  <div class="container">
+    <div class="row">
+
+      <!-- Left Column: Profile Sidebar -->
+      <div class="col-lg-4 mb-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <div class="text-end mb-2">
+              <a href="{% url 'edit-account' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+            </div>
+            <img src="{{employee.image_avatar.url}}" class="rounded-circle mb-3" width="120" height="120" />
+            <h3>{{employee.name}}</h3>
+            <p class="text-muted">{{employee.bio}}</p>
+            <p class="text-secondary small">{{employee.city}}</p>
+            {% comment %} <div class="d-flex justify-content-center gap-3 my-3">
+              <a href="#" title="Github"><i class="fab fa-github fs-5"></i></a>
+              <a href="#" title="StackOverflow"><i class="fab fa-stack-overflow fs-5"></i></a>
+              <a href="#" title="Twitter"><i class="fab fa-twitter fs-5"></i></a>
+              <a href="#" title="LinkedIn"><i class="fab fa-linkedin fs-5"></i></a>
+              <a href="#" title="Website"><i class="fas fa-globe fs-5"></i></a>
+            </div> {% endcomment %}
+            {% comment %} <a href="#" class="btn btn-primary btn-sm">Send Message</a> {% endcomment %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Info -->
+      <div class="col-lg-8">
+
+        <!-- About Section -->
+        <div class="mb-5">
+          <h4>About Me</h4>
+          <p>
+            {{employee.bio|default:"No description provided."}}
+        </p>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="mb-4">
+          <h4 class="mb-3">Programming Languages</h4>
+          <form method="post" action="{% url 'add-language' %}" class="d-flex mb-3">
+            {% csrf_token %}
+            <input type="text" name="language" class="form-control me-2" placeholder="Add new language">
+            <button type="submit" class="btn btn-success">Add</button>
+          </form>
+          <table class="table table-bordered align-middle">
+            <tbody>
+              {% for language in employee.programming_languages.all %}
+              <tr>
+                <td>
+                  <h6 class="mb-1">{{ language.language }}</h6>
+                </td>
+                <td class="text-end">
+                  <form method="post" action="{% url 'delete-language' language.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                      <i class="fas fa-times-circle"></i> Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Applications Section -->
+        <div class="mb-4">
+          <h4 class="mb-3">My Job Applications</h4>
+          {% if applications %}
+            <table class="table table-bordered align-middle">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Employer</th>
+                  <th>Status</th>
+                  <th>Applied At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for app in applications %}
+                  <tr>
+                    <td><a href="{% url 'job' app.job.id %}">{{ app.job.title }}</a></td>
+                    <td>{{ app.job.employer.name }}</td>
+                    <td>
+                      {% if app.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                      {% elif app.status == 'accepted' %}
+                        <span class="badge bg-success">Accepted</span>
+                      {% elif app.status == 'rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ app.applied_at|date:"F j, Y" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="alert alert-info">You have not applied for any jobs yet.</div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+{% elif user_type == 'employer' %}
+<main class="settingsPage py-5">
+  <div class="container">
+    <div class="row">
+
+      <!-- Left Column: Profile Sidebar -->
+      <div class="col-lg-4 mb-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <div class="text-end mb-2">
+              <a href="{% url 'edit-account' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+            </div>
+            <img src="{{ employer.image_avatar.url }}" class="rounded-circle mb-3" width="120" height="120" />
+            <h3>{{ employer.name }}</h3>
+            <p class="text-muted">{{ employer.company }}</p>
+            <p class="text-secondary small">{{ employer.city }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Info -->
+      <div class="col-lg-8">
+
+        <!-- About Section -->
+        <div class="mb-5">
+          <h4>About Company</h4>
+          <p>
+            <strong>Company:</strong> {{ employer.company|default:"No company name provided." }}<br>
+            <strong>Email:</strong> {{ employer.email|default:"No email provided." }}<br>
+            <strong>City:</strong> {{ employer.city|default:"No city provided." }}
+          </p>
+        </div>
+
+        <!-- Projects Section (Optional) -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Jobs</h4>
+          <a href="{% url 'create-job'%}" class="btn btn-outline-success btn-sm">
+            <i class="fas fa-plus"></i> Add Job
+          </a>
+        </div>
+        <table class="table table-bordered align-middle">
+          <tbody>
+            {%for job in employer.job_set.all%}
+            <tr>
+              <td>
+                <a href="{% url 'job' job.id %}" class="fw-bold">{{job.title}}</a>
+                <p class="mb-0 small">{{job.description}}</p>
+              </td>
+              <td class="text-end">
+                        {% if request.user.is_authenticated and request.user.profile.user_type == 'employer' and request.user.employer == job.employer %}
+            <a href="{% url 'manage-applications' job.id %}" class="btn btn-primary">Manage Applications</a>
+
+        {% endif %}
+                <a href="{% url 'update-job' job.id %}" class="btn btn-outline-primary btn-sm me-2">
+                  <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="{% url 'delete-job' job.id %}" class="btn btn-outline-danger btn-sm">
+                  <i class="fas fa-times-circle"></i> Delete
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</main>
+{% endif %}
+
+
+
+{% endblock %}

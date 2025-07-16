@@ -5,11 +5,11 @@
   <!-- Hero Section with Search -->
   <section class="hero-section text-center py-5 bg-light">
     <div class="container">
-      <h2 class="mb-4">Search for <span class="text-primary">Projects</span></h2>
+      <h2 class="mb-4">Search for <span class="text-primary">Jobs</span></h2>
 
       <form class="row g-3 justify-content-center" action="#" method="get">
         <div class="col-md-6">
-          <label for="formInputSearch" class="form-label">Search By Projects</label>
+          <label for="formInputSearch" class="form-label">Search By Jobs</label>
           <input type="text" class="form-control" id="formInputSearch" name="text" placeholder="Search by Project Title">
         </div>
         <div class="col-md-2 d-grid align-items-end">
@@ -19,52 +19,31 @@
     </div>
   </section>
 
-  <!-- Project Cards Section -->
   <section class="projectsList py-5">
     <div class="container">
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
-        <!-- Project Card Start -->
+        {% for job in jobs %}
         <div class="col">
           <div class="card h-100 shadow-sm">
-            <a href="single-project.html">
-              <img src="images/project-a.png" class="card-img-top" alt="Project Thumbnail">
-            </a>
-            <div class="card-body">
-              <h5 class="card-title">Yoga Studio Landing Page Website and Design</h5>
-              <p class="card-text"><a href="profile.html" class="text-decoration-none">By Dennis Ivanov</a></p>
-              <p><strong>98%</strong> Positive Feedback (72 Votes)</p>
-              <div class="d-flex flex-wrap gap-2">
-                <span class="badge bg-primary">NextJS</span>
-                <span class="badge bg-primary">GraphQL</span>
-                <span class="badge bg-primary">TypeScript</span>
+            <a href="{% url 'job' job.id %}" class="stretched-link text-decoration-none text-dark">
+              <div class="card-body">
+          <h5 class="card-title">{{ job.title }}</h5>
+          <p class="card-text">{{ job.employer.name }}</p>
+          <p>{{ job.description }}</p>
+          <div class="d-flex flex-wrap gap-2">
+            {% for language in job.programming_languages.all %}
+              <span class="badge bg-primary">{{ language.language }}</span>
+            {% empty %}
+              <span class="text-muted"> No languages listed </span>
+            {% endfor %}
+          </div>
               </div>
-            </div>
+            </a>
           </div>
         </div>
-        <!-- Project Card End -->
+        {% endfor %}
 
-        <!-- Duplicate and change content as needed -->
-        <div class="col">
-          <div class="card h-100 shadow-sm">
-            <a href="single-project.html">
-              <img src="images/project-b.png" class="card-img-top" alt="Project Thumbnail">
-            </a>
-            <div class="card-body">
-              <h5 class="card-title">DevSearch UI Design</h5>
-              <p class="card-text"><a href="profile.html" class="text-decoration-none">By Shahriar P. Shuvo</a></p>
-              <p><strong>92%</strong> Positive Feedback (62 Votes)</p>
-              <div class="d-flex flex-wrap gap-2">
-                <span class="badge bg-primary">NextJS</span>
-                <span class="badge bg-primary">GraphQL</span>
-                <span class="badge bg-primary">TypeScript</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Repeat structure for other projects as needed -->
-        <!-- ... -->
 
       </div>
     </div>

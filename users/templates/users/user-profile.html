@@ -1,0 +1,120 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="profile py-5">
+  <div class="container">
+    <div class="row">
+      
+      <!-- Sidebar / Profile Card -->
+      <div class="col-lg-4 mb-4">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <img src="{{employee.image_avatar.url}}" class="rounded-circle mb-3" width="120" height="120" alt="Avatar" />
+            <h3>{{employee.name}}</h3>
+            <p class="text-muted">{{ employee.bio }}</p>
+            <p class="text-secondary small">{{employee.city}}</p>
+            {% comment %} <div class="d-flex justify-content-center gap-3 my-3">
+              <a href="#" target="_blank" title="GitHub"><i class="fab fa-github fs-5"></i></a>
+              <a href="#" target="_blank" title="StackOverflow"><i class="fab fa-stack-overflow fs-5"></i></a>
+              <a href="#" target="_blank" title="Twitter"><i class="fab fa-twitter fs-5"></i></a>
+              <a href="#" target="_blank" title="LinkedIn"><i class="fab fa-linkedin fs-5"></i></a>
+              <a href="#" target="_blank" title="Website"><i class="fas fa-globe fs-5"></i></a>
+            </div> {% endcomment %}
+            {% comment %} <a href="#" class="btn btn-primary btn-sm">Send Message</a> {% endcomment %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        
+        <!-- About Me -->
+        <div class="mb-5">
+          <h4>About Me</h4>
+          <p>
+            {{employee.bio}}
+          </p>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="mb-5">
+          <h4>Programing Languages</h4>
+          {% for language in employee.programming_languages.all %}
+            <span class="badge bg-secondary">{{ language.language }}</span>
+          {% endfor %}
+
+
+        <!-- Projects Section -->
+        <div>
+          <h4>Projects</h4>
+          <div class="row row-cols-1 row-cols-md-2 g-4 mt-3">
+
+            <!-- Project Card -->
+            <div class="col">
+              <div class="card h-100 shadow-sm">
+                <img src="images/project-b.png" class="card-img-top" alt="Project Thumbnail" />
+                <div class="card-body">
+                  <h5 class="card-title">DevSearch UI Design</h5>
+                  <p class="card-text">
+                    <a href="profile.html" class="text-decoration-none">By Shahriar P. Shuvo</a>
+                  </p>
+                  <p><strong>92%</strong> Positive Feedback (62 Votes)</p>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary">NextJS</span>
+                    <span class="badge bg-primary">GraphQL</span>
+                    <span class="badge bg-primary">TypeScript</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project Card -->
+            <div class="col">
+              <div class="card h-100 shadow-sm">
+                <img src="images/project-c.png" class="card-img-top" alt="Project Thumbnail" />
+                <div class="card-body">
+                  <h5 class="card-title">Another Landing Page</h5>
+                  <p class="card-text">
+                    <a href="profile.html" class="text-decoration-none">By Dennis Ivanov</a>
+                  </p>
+                  <p><strong>36%</strong> Positive Feedback (18 Votes)</p>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary">NextJS</span>
+                    <span class="badge bg-primary">GraphQL</span>
+                    <span class="badge bg-primary">TypeScript</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project Card -->
+            <div class="col">
+              <div class="card h-100 shadow-sm">
+                <img src="images/project-a.png" class="card-img-top" alt="Project Thumbnail" />
+                <div class="card-body">
+                  <h5 class="card-title">Yoga Studio Landing Page Website and Design</h5>
+                  <p class="card-text">
+                    <a href="profile.html" class="text-decoration-none">By Dennis Ivanov</a>
+                  </p>
+                  <p><strong>98%</strong> Positive Feedback (72 Votes)</p>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary">NextJS</span>
+                    <span class="badge bg-primary">GraphQL</span>
+                    <span class="badge bg-primary">TypeScript</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+
+{% endblock content %}

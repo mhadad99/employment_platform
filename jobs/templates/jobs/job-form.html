@@ -1,0 +1,35 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <h1 class="formTitle">Post a Job</h1>
+            <a class="backButton" href="{% url 'jobs' %}"><i class="fa fa-arrow-left"></i></a>
+            <br><br>
+            <form class="form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form__field mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <div class="form__field mb-3">
+                    <label for="id_newLanguages" class="form-label">Add New Programming Languages (separate by comma or space)</label>
+                    <input type="text" name="newLanguages" id="id_newLanguages" class="form-control" placeholder="e.g. Rust, Elixir">
+                    <small class="form-text text-muted">If not listed above, add new languages here.</small>
+                </div>
+                <input class="btn btn--sub btn--lg my-md" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock content %}

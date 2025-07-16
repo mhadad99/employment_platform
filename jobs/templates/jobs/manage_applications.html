@@ -1,0 +1,85 @@
+{% extends 'main.html' %}
+{% block content %}
+<main class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h2 class="card-title mb-3">Manage Applications for: <span class="text-primary">{{ job.title }}</span></h2>
+            <div class="mb-2">
+              <span class="fw-bold">Employer:</span> {{ job.employer.name }}
+            </div>
+            <div class="mb-2">
+              <span class="fw-bold">Required Languages:</span>
+              {% for lang in job.programming_languages.all %}
+                <span class="badge bg-primary">{{ lang.language }}</span>
+              {% empty %}
+                <span class="text-muted">None</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h4 class="mb-4">Applications</h4>
+            {% if applications %}
+              <table class="table table-bordered align-middle">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Bio</th>
+                    <th>City</th>
+                    <th>Experience</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for app in applications %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'user-profile' app.employee.id %}">{{ app.employee.name }}</a>
+                    </td>
+                    <td>{{ app.employee.bio|default:"-" }}</td>
+                    <td>{{ app.employee.city|default:"-" }}</td>
+                    <td>{{ app.employee.experience_level|default:"-" }}</td>
+                    <td>
+                      {% if app.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                      {% elif app.status == 'accepted' %}
+                        <span class="badge bg-success">Accepted</span>
+                      {% elif app.status == 'rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if app.status == 'pending' %}
+                        <form method="post" action="{% url 'update-application' app.id %}" class="d-inline">
+                          {% csrf_token %}
+                          <button name="action" value="accept" class="btn btn-success btn-sm">Accept</button>
+                          <button name="action" value="reject" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                      {% else %}
+                        <span class="text-muted">No actions</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <div class="alert alert-info">No applications yet.</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="text-end mt-3">
+          <a href="{% url 'jobs' %}" class="btn btn-outline-secondary">Back to Jobs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock content %}

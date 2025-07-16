@@ -63,3 +63,16 @@ class EmployerRegistrationForm(forms.ModelForm):
         widgets = {
             'company': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Company Name'}),
         }
+
+
+class EmployeeForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        fields = ['name', 'email', 'username',
+                  'city', 'bio', 'image_avatar', 'experience_level', 'national_id',]
+
+    def __init__(self, *args, **kwargs):
+        super(EmployeeForm, self).__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})

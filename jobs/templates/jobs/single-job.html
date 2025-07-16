@@ -1,0 +1,68 @@
+{% extends 'main.html' %}
+{% block content %}
+<main class="py-5">
+          <div class="text-start">
+          <a href="{% url 'jobs' %}" class="btn btn-outline-secondary">Back to Jobs</a>
+        </div> 
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h2 class="card-title mb-3">{{ job.title }}</h2>
+            <div class="mb-2">
+              <span class="fw-bold">Employer:</span>
+              
+                {{ job.employer.name }}
+            </div>
+            <div class="mb-2">
+              <span class="fw-bold">Posted:</span>
+              {{ job.created_at|date:"F j, Y" }}
+            </div>
+            <div class="mb-3">
+              <span class="fw-bold">Required Programming Languages:</span>
+              <div class="d-flex flex-wrap gap-2 mt-2">
+                {% for language in job.programming_languages.all %}
+                  <span class="badge bg-primary">{{ language.language }}</span>
+                {% empty %}
+                  <span class="text-muted">No languages listed</span>
+                {% endfor %}
+              </div>
+            </div>
+            <hr>
+            <h5 class="mb-2">Job Description</h5>
+            <p class="card-text">{{ job.description }}</p>
+            {% if job.employee %}
+              <hr>
+              <div>
+                <span class="fw-bold">Assigned To:</span>
+                <a href="{% url 'user-profile' job.employee.id %}" class="text-decoration-none">
+                  {{ job.employee.name }}
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        {% if request.user.is_authenticated and request.user.profile.user_type == 'employee' %}
+          <form method="post" action="{% url 'apply-job' job.id %}">
+            {% csrf_token %}
+
+            <button type="submit" class="btn btn-success">Apply for this Job</button>
+          </form>
+        {% endif %}
+
+        {% if request.user.is_authenticated and request.user.profile.user_type == 'employer' and request.user.employer == job.employer %}
+          <div class="mt-4">
+            <a href="{% url 'manage-applications' job.id %}" class="btn btn-primary">Manage Applications</a>
+          </div>
+        {% endif %}
+
+         </div>
+
+
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock content %}

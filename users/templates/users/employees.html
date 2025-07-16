@@ -1,0 +1,77 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<main class="home">
+
+  <!-- Hero/Search Section -->
+  <section class="text-center py-5 bg-light">
+    <div class="container">
+      <h2 class="mb-2">CONNECT WITH <span class="text-primary">DEVELOPERS</span></h2>
+      <h2 class="mb-4">FROM AROUND THE WORLD</h2>
+
+      <form method="get" action="{% url 'search-employees' %}" class="row g-3 mb-4">
+        <div class="col-md-3">
+          <input type="text" name="q" class="form-control" placeholder="Search bio..." value="{{ query }}">
+        </div>
+        <div class="col-md-3">
+          <input type="text" name="language" class="form-control" placeholder="Programming Language" value="{{ language }}">
+        </div>
+        <div class="col-md-2">
+          <input type="text" name="city" class="form-control" placeholder="City" value="{{ city }}">
+        </div>
+        <div class="col-md-2">
+          <select name="experience" class="form-select">
+            <option value="">Experience Level</option>
+            <option value="Junior" {% if experience == "Junior" %}selected{% endif %}>Junior</option>
+            <option value="Mid" {% if experience == "Mid" %}selected{% endif %}>Mid</option>
+            <option value="Senior" {% if experience == "Senior" %}selected{% endif %}>Senior</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Developer Cards Section -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+        {% for employee in employees %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{{employee.image_avatar.url}}" class="rounded-circle me-3" width="60" height="60" alt="image">
+                <div>
+                  <h5 class="mb-0">{{employee.name}}</h5>
+                  <small class="text-muted">{{employee.bio}}</small>
+                </div>
+              </div>
+              <p class="card-text">
+                {{employee.bio}}</p>
+              <div class="d-flex flex-wrap gap-2">
+                {% for language in employee.programming_languages.all|slice:":4" %}
+                <span class="badge bg-primary">{{language.language}}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="card-footer text-end bg-white border-top-0">
+              <a href="{% url 'user-profile' employee.id %}" class="btn btn-outline-primary btn-sm">View Profile</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+
+
+
+      </div>
+    </div>
+  </section>
+
+</main>
+{% endblock content %}
