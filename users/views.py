@@ -13,7 +13,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from jobs.models import Notification
 from datetime import timedelta
-
+from jobs.utils import match_emplyees  # Add this import at the top
 
 
 # Create your views here.
@@ -31,7 +31,6 @@ def add_language(request):
     return redirect('user-account')
 
 
-
 @login_required(login_url='login')
 @require_POST
 def delete_language(request, lang_id):
@@ -42,9 +41,6 @@ def delete_language(request, lang_id):
     except ProgrammingLanguage.DoesNotExist:
         pass
     return redirect('user-account')
-
-
-
 
 
 def loginUser(request):
@@ -168,7 +164,8 @@ def userProfile(request, pk):
             ).exists()
 
             if not recent_view:
-                ProfileView.objects.create(employee=employee, viewer=current_user)
+                ProfileView.objects.create(
+                    employee=employee, viewer=current_user)
 
                 message = f"{current_user.first_name} viewed your profile."
                 Notification.objects.create(
@@ -203,24 +200,23 @@ def userProfile(request, pk):
 
 @login_required(login_url='login')
 def userAccount(request):
-    if request.user.profile.user_type == 'employee':
-        employee = Employee.objects.get(user=request.user)
+    user = request.user
+    # Check user_type from Employee or Employer model directly
+    if Employee.objects.filter(user=user).exists():
+        employee = Employee.objects.get(user=user)
         applications = employee.jobapplication_set.all()
-        
-        # Get total profile views
         total_views = ProfileView.objects.filter(employee=employee).count()
-
         context = {
             'employee': employee,
-            'user_type': request.user.profile.user_type,
+            'user_type': 'employee',
             'applications': applications,
             'total_profile_views': total_views
         }
-    elif request.user.profile.user_type == 'employer':
-        employer = Employer.objects.get(user=request.user)
+    elif Employer.objects.filter(user=user).exists():
+        employer = Employer.objects.get(user=user)
         context = {
             'employer': employer,
-            'user_type': request.user.profile.user_type
+            'user_type': 'employer'
         }
     else:
         messages.error(request, 'Invalid user type')
@@ -252,8 +248,21 @@ def searchEmployees(request):
     city = request.GET.get('city', '')
     experience = request.GET.get('experience', '')
 
+    # Use match_emplyees for bio search if query is present
     if query:
-        employees = employees.filter(bio__icontains=query)
+        # match_emplyees expects a string (job_text), so we use the query as the "job_text"
+        matched_employees = match_emplyees(query)
+        # match_emplyees returns a list of (employee, score) tuples or Employee objects
+        # If it's a list of tuples, extract employees
+        if matched_employees and isinstance(matched_employees[0], tuple):
+            employees = [emp for emp,
+                         score in matched_employees if score > 0.2]
+        else:
+            employees = matched_employees
+
+        # Convert to queryset if needed for further filtering
+        employee_ids = [emp.id for emp in employees]
+        employees = Employee.objects.filter(id__in=employee_ids)
     if language:
         employees = employees.filter(
             programming_languages__language__iexact=language)

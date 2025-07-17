@@ -36,7 +36,7 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'user-account' %}">My Account</a>
         </li>
-        {% if request.user.profile.user_type == 'employer' %}
+        {% if request.user.is_authenticated and request.user.employee %}
         <li class="nav-item">
           <a class="btn btn-primary me-2" href="{% url 'create-job' %}">Post a Job</a>
         </li>

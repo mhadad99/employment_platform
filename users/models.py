@@ -28,6 +28,7 @@ class Employee(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField(max_length=200, blank=True, null=True)
     username = models.CharField(max_length=200, blank=True, null=True)
+    title = models.CharField(max_length=200, blank=True, null=True)
     image_avatar = models.ImageField(
         null=True, blank=True, upload_to="avatars/", default='avatars/user-default.png')
     city = models.CharField(max_length=200, blank=True, null=True)

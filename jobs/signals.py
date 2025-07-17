@@ -2,29 +2,25 @@ from django.dispatch import receiver
 from jobs.models import Job, Notification
 from django.db.models import Q
 from django.db.models.signals import post_save, post_delete
+
+from jobs.utils import match_emplyees
 from .models import JobApplication, Notification
 from users.models import Employee
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+
 
 
 def notify_employee_of_matching_jobs(employee):
-    # Get programming languages
     langs = employee.programming_languages.values_list('language', flat=True)
-    # Get bio keywords (split by space, simple approach)
     bio_keywords = employee.bio.lower().split() if employee.bio else []
 
-    # Find jobs matching programming languages
     jobs_by_lang = Job.objects.filter(
         programming_languages__language__in=langs)
-    # Find jobs matching bio keywords in title or description
     jobs_by_bio = Job.objects.none()
     for word in bio_keywords:
         jobs_by_bio |= Job.objects.filter(
             Q(title__icontains=word) | Q(description__icontains=word)
         )
 
-    # Combine and remove duplicates
     matching_jobs = (jobs_by_lang | jobs_by_bio).distinct()
 
     if matching_jobs.exists():
@@ -64,24 +60,10 @@ def notify_employees_on_new_job(sender, instance, created, **kwargs):
     job = instance
     job_text = job.title + ' ' + job.description
 
-    all_employees = Employee.objects.all()
-    bios = [emp.bio for emp in all_employees]
 
-    vectorizer = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = vectorizer.fit_transform([job_text] + bios)  
-
-    similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
-
-    threshold = 0.2
-    matched_employees = [
-        emp for emp, score in zip(all_employees, similarities) if score >= threshold
-    ]
-
-    employees_by_language = Employee.objects.filter(
-        programming_languages__in=job.programming_languages.all()
-    ).distinct()
-
-    final_employees = list(set(list(matched_employees) + list(employees_by_language)))
+    final_employees = match_emplyees(job_text)
+    if not final_employees:
+        return
 
     for employee in final_employees:
         Notification.objects.create(
